@@ -1,5 +1,38 @@
 "use strict";
 
+/// Testing stuff
+
+var _check_passed = 0;
+var _check_no = 0;
+
+var formatarg = function(x) { return x; };
+var equalp = function(a, b) { return a === b; };
+
+function _check_msg(a, b, name, cmp) {
+  console.log("Check '" + (name ? name : "unnamed") + ":" + _check_no +
+              "' Failed: " + formatarg(a) + " " + cmp + " " + formatarg(b));
+}
+
+function check_eq(a, b, name) {
+  ++_check_no;
+  if(!equalp(a, b)) {
+    _check_msg(a, b, name, "ne");
+  }
+  else {
+    ++_check_passed;
+  }
+}
+
+function check_ne(a, b, name) {
+  if(equalp(a, b)) {
+    _check_msg(a, b, name, "eq");
+  }
+}
+
+function check_status() {
+  console.log("Passed " + _check_passed + " of " + _check_no + " tests!");
+}
+
 /// Vec3: 3 element Vector
 function createVec3(heap_size) {
   if(heap_size === undefined || heap_size < 4096) {
@@ -159,6 +192,14 @@ function createVec3(heap_size) {
       return;
     }
 
+    function equal(a, b) {
+      a = a|0;
+      b = b|0;
+      return ((+get(a,0) == +get(b,0))|0 +
+              (+get(a,1) == +get(b,1))|0 +
+              (+get(a,2) == +get(b,2))|0)|0;
+    }
+
     return {
       create : create,
       clone : clone,
@@ -175,9 +216,11 @@ function createVec3(heap_size) {
       sqrLen : squareLength,
       length : length,
       len : length,
+      negate : negate,
       normalize : normalize,
       dot : dot,
-      cross : cross
+      cross : cross,
+      equal : equal
     };
   })(window, null, heap);
 
@@ -199,6 +242,42 @@ function createVec3(heap_size) {
 }
 
 var vec3 = createVec3();
+
+/// Vec3 tests
+var a = vec3.create(); // [0,0,0]
+var b = vec3.fromValues(1.0, 2.0, 3.0);
+var c = vec3.create();
+check_ne(a, b);
+check_ne(b, c);
+check_ne(a, c);
+
+formatarg = vec3.format;
+equalp = vec3.equal;
+
+vec3.add(c, a, b); // c = a + b
+check_eq(c, b);
+check_ne(c, a);
+
+vec3.add(c, a, a);
+check_eq(c, a);
+check_ne(c, b);
+
+vec3.sub(c, b, b);
+check_ne(c, b);
+check_eq(c, a);
+
+vec3.setValues(a, 1.0, 1.0, 1.0);
+vec3.add(c, a, b);
+check_eq(c, vec3.fromValues(2.0, 3.0, 4.0));
+
+vec3.sub(c, b, a);
+check_eq(c, vec3.fromValues(0.0, 1.0, 2.0));
+
+vec3.sub(c, a, b);
+check_eq(c, vec3.fromValues(0.0, -1.0, -2.0));
+
+vec3.negate(c, b);
+check_eq(c, vec3.fromValues(-1.0, -2.0, -3.0));
 
 /// Mat4: 4×4 Matrix
 function createMat4(heap_size) { // heap_size is optional.
@@ -372,3 +451,5 @@ var C = mat4.create();
 mat4.multiply(C, A, B); // C = A × B
 
 console.log(mat4.format(C));
+
+check_status();
