@@ -1,0 +1,17 @@
+# -*- mode:org; mode:auto-fill; fill-column:80; coding:utf-8; -*-
+* TODO freeing matrices/vectors.
+We can't use the GC because =asm.js= lacks support for it.  But at least manual
+free should be supported.  This requires a change of internal memory
+management.  One solution would be to use a "free list" to contain
+pointers to freed data fields.  This would however require a bit of effort to
+implement in =asm.js= or require the use of the FFI.
+* TODO interoperability.
+Vec3 and Mat4 live on separate heaps.  The FFI has to be used to make the
+interoperable.  Monitoring the performance impact is important.  Merging the
+heap of Vec3 and Mat4 would avoid this but make heap management far more
+complicated.
+* TODO finish mat4
+* TODO optimize
+* TODO benchmark
+* TODO world peace
+
