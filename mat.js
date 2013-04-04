@@ -5,18 +5,28 @@
 var _check_passed = 0;
 var _check_no = 0;
 
-var formatarg = function(x) { return x; };
-var equalp = function(a, b) { return a === b; };
+function _check_formatarg(x) { return x; };
+function _check_equalp (a, b) {
+  return a === b;
+};
+// This is a bit silly but vecs and mats are just ints...
+var formatarg = _check_formatarg;
+var equalp = _check_equalp;
 
-function _check_msg(a, b, name, cmp) {
-  console.log("Check '" + (name ? name : "unnamed") + ":" + _check_no +
-              "' Failed: " + formatarg(a) + " " + cmp + " " + formatarg(b));
+function check_reset() {
+  formatarg = _check_formatarg;
+  equalp = _check_equalp;
+}
+
+function _check_error_msg(a, b, name, cmp) {
+  console.error("Check '" + (name ? name : "unnamed") + ":" + _check_no +
+                "' Failed: " + formatarg(a) + " " + cmp + " " + formatarg(b));
 }
 
 function check_eq(a, b, name) {
   ++_check_no;
   if(!equalp(a, b)) {
-    _check_msg(a, b, name, "ne");
+    _check_error_msg(a, b, name, "ne");
   }
   else {
     ++_check_passed;
@@ -25,12 +35,12 @@ function check_eq(a, b, name) {
 
 function check_ne(a, b, name) {
   if(equalp(a, b)) {
-    _check_msg(a, b, name, "eq");
+    _check_error_msg(a, b, name, "eq");
   }
 }
 
 function check_status() {
-  console.log("Passed " + _check_passed + " of " + _check_no + " tests!");
+  console.info("Passed " + _check_passed + " of " + _check_no + " tests!");
 }
 
 /// Vec3: 3 element Vector
@@ -245,39 +255,79 @@ var vec3 = createVec3();
 
 /// Vec3 tests
 var a = vec3.create(); // [0,0,0]
+check_eq(vec3.get(a, 0), 0.0);
+check_eq(vec3.get(a, 1), 0.0);
+check_eq(vec3.get(a, 2), 0.0);
 var b = vec3.fromValues(1.0, 2.0, 3.0);
-var c = vec3.create();
+check_eq(vec3.get(b, 0), 1.0);
+check_eq(vec3.get(b, 1), 2.0);
+check_eq(vec3.get(b, 2), 3.0);
+var c = vec3.clone(a);
+check_eq(vec3.get(c, 0), 0.0);
+check_eq(vec3.get(c, 1), 0.0);
+check_eq(vec3.get(c, 2), 0.0);
 check_ne(a, b);
 check_ne(b, c);
 check_ne(a, c);
 
 formatarg = vec3.format;
 equalp = vec3.equal;
-
 vec3.add(c, a, b); // c = a + b
-check_eq(c, b);
-check_ne(c, a);
+check_eq(c, b, "vec3.add#1.1");
+check_ne(c, a, "vec3.add#1.2");
 
 vec3.add(c, a, a);
-check_eq(c, a);
-check_ne(c, b);
+check_eq(c, a, "vec3.add#2.1");
+check_ne(c, b, "vec3.add#2.2");
 
 vec3.sub(c, b, b);
-check_ne(c, b);
-check_eq(c, a);
+check_ne(c, b, "vec3.subtract#1.1");
+check_eq(c, a, "vec3.subtract#1.2");
 
 vec3.setValues(a, 1.0, 1.0, 1.0);
 vec3.add(c, a, b);
-check_eq(c, vec3.fromValues(2.0, 3.0, 4.0));
+var v = vec3.fromValues(2.0, 3.0, 4.0);
+check_eq(c, v, "vec3.add#3");
 
 vec3.sub(c, b, a);
-check_eq(c, vec3.fromValues(0.0, 1.0, 2.0));
+vec3.setValues(v, 0.0, 1.0, 2.0);
+check_eq(c, v, "vec3.subtract#2");
 
-vec3.sub(c, a, b);
-check_eq(c, vec3.fromValues(0.0, -1.0, -2.0));
+vec3.subtract(c, a, b);
+vec3.setValues(v, 0.0, -1.0, -2.0);
+check_eq(c, v, "vec3.subtract#3");
 
 vec3.negate(c, b);
-check_eq(c, vec3.fromValues(-1.0, -2.0, -3.0));
+vec3.setValues(v, -1.0, -2.0, -3.0);
+check_eq(c, v, "vec3.negate");
+
+vec3.scale(c, b, 2.0);
+vec3.setValues(v, 2.0, 4.0, 6.0);
+check_eq(c, v, "vec3.scale");
+
+vec3.cross(c, a, b);
+vec3.setValues(v, 1.0, -2.0, 1.0);
+check_eq(c, v, "vec3.cross");
+
+check_reset();
+var tmp = vec3.squareLength(a);
+check_eq(tmp, 3.0, "vec3.squareLength#1");
+tmp = vec3.squareLength(b);
+check_eq(tmp, 14.0, "vec3.squareLength#2");
+vec3.setValues(v, 0.0, 1.0, 0.0);
+tmp = vec3.length(v);
+check_eq(tmp, 1.0, "vec3.length");
+vec3.setValues(v, 0.0, 0.0, 0.0);
+vec3.normalize(c, v);
+check_eq(vec3.get(c, 0), 0.0, "vec3.norm");
+check_eq(vec3.get(c, 1), 0.0, "vec3.norm");
+check_eq(vec3.get(c, 2), 0.0, "vec3.norm");
+
+tmp = vec3.squareLength(b);
+var tmp2 = vec3.dot(b, b);
+check_eq(tmp, tmp2, "vec3.dot#1");
+tmp = vec3.dot(a, b);
+check_eq(tmp, 6.0, "vec3.dot#2");
 
 /// Mat4: 4×4 Matrix
 function createMat4(heap_size) { // heap_size is optional.
@@ -434,6 +484,8 @@ function createMat4(heap_size) { // heap_size is optional.
 }
 
 var mat4 = createMat4();
+
+/// Mat4 Tests
 
 var A = mat4.create();
 mat4.set(A, 0, 0, 4.0);
