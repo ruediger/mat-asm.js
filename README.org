@@ -23,3 +23,8 @@ represents a "pointer" on the module internal heap.  To get an array use
 =mat4.getArray= or =vec3.getArray=.
 
 Contributions are welcome.
+
+One major design drawback is that matrices and vectors are *not* garbage
+collected.  To make matters worse you can't even manually free them because at
+the moment the internal memory is simply used as a stack.  So try to reuse
+pointers.
