@@ -206,7 +206,7 @@ function createMat4(heap_size) { // heap_size is optional.
     heap_size = 4096;
   }
   var heap = new ArrayBuffer(4096);
-  var mat4 = (function createMat4_asmjs(stdlib, foreign, heap) {
+  var mat4 = (function(stdlib, foreign, heap) {
     "use asm";
 
     var HEAP = new stdlib.Float32Array(heap);
