@@ -1,0 +1,25 @@
+# -*- mode:org; mode:auto-fill; fill-column:80; coding:utf-8; -*-
+* mat-asm.js: Simple linear algebra implementation using asm.js
+This is an experiment of mine to get a bit familiar with [[http://asmjs.org/][asm.js]] and test
+potential performance gains.  The code is not a full linear algebra library and
+only supports 4×4 matrices and 3 element vectors.  Its API is a bit inspired by
+[[http://glmatrix.net/][glMatrix]] but not fully compatible!  All of it is a work in progress and
+currently not really useful!
+
+There is still a lot to do and only some basic things work (mostly untested).
+
+It should work with any browser supporting [[https://developer.mozilla.org/en-US/docs/JavaScript/Typed_arrays][Typed Arrays]] (at least current Chrome
+and Firefox).  However to get the (potential) performance gain from asm.js a
+[[http://nightly.mozilla.org/][Nightly release of Firefox]] is required at the moment.  For Ubuntu simply use the
+[[https://launchpad.net/~ubuntu-mozilla-daily/+archive/ppa][Mozilla Daily PPA]].
+
+Simply open the file =index.html= with Firefox Nightly and open the "Web
+Console" (Ctrl+Shift+K).  It should print the message "Successfully compiled
+asm.js code".
+
+A major difference compared to glMatrix is the way matrices and vectors are
+presented to the user.  In mat-asm.js the user only gets an integer which
+represents a "pointer" on the module internal heap.  To get an array use
+=mat4.getArray= or =vec3.getArray=.
+
+Contributions are welcome.
