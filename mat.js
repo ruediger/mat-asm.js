@@ -1,7 +1,6 @@
 "use strict";
 
 /// Testing stuff
-
 var _check_passed = 0;
 var _check_no = 0;
 
@@ -441,6 +440,57 @@ function createMat4(heap_size) { // heap_size is optional.
       return;
     }
 
+    function equal(A, B) {
+      A = A|0;
+      B = B|0;
+      var ret = 0;
+      var i = 0;
+      var j = 0;
+      for(i=0; (i|0) < 4; i = ((i|0) + 1)|0) {
+        for(j=0; (j|0) < 4; j = ((j|0) + 1)|0) {
+          ret = ((ret|0) + ((+get(A, i, j) == +get(B, i, j))|0))|0;
+        }
+      }
+      return ret|0;
+    }
+
+    function fromValues(a00, a01, a02, a03,
+                        a10, a11, a12, a13,
+                        a20, a21, a22, a23,
+                        a30, a31, a32, a33)
+    {
+      a00 = +a00; a01 = +a01; a02 = +a02; a03 = +a03;
+      a10 = +a10; a11 = +a11; a12 = +a12; a13 = +a13;
+      a20 = +a20; a21 = +a21; a22 = +a22; a23 = +a23;
+      a30 = +a30; a31 = +a31; a32 = +a32; a33 = +a33;
+      var out = 0;
+      out = _newmat()|0;
+      setValues(out,
+                a00, a01, a02, a03,
+                a10, a11, a12, a13,
+                a20, a21, a22, a23,
+                a30, a31, a32, a33);
+      return out|0;
+    }
+
+    function setValues(A,
+                       a00, a01, a02, a03,
+                       a10, a11, a12, a13,
+                       a20, a21, a22, a23,
+                       a30, a31, a32, a33)
+    {
+      A = A|0;
+      a00 = +a00; a01 = +a01; a02 = +a02; a03 = +a03;
+      a10 = +a10; a11 = +a11; a12 = +a12; a13 = +a13;
+      a20 = +a20; a21 = +a21; a22 = +a22; a23 = +a23;
+      a30 = +a30; a31 = +a31; a32 = +a32; a33 = +a33;
+      set(A, 0, 0, a00); set(A, 0, 1, a01); set(A, 0, 2, a02); set(A, 0, 3, a03);
+      set(A, 1, 0, a10); set(A, 1, 1, a11); set(A, 1, 2, a12); set(A, 1, 3, a13);
+      set(A, 2, 0, a20); set(A, 2, 1, a21); set(A, 2, 2, a22); set(A, 2, 3, a23);
+      set(A, 3, 0, a30); set(A, 3, 1, a31); set(A, 3, 2, a32); set(A, 3, 3, a33);
+      return;
+    }
+
     return {
       create : create,
       identity : identity,
@@ -449,7 +499,10 @@ function createMat4(heap_size) { // heap_size is optional.
       set : set,
       get : get,
       multiply : multiply,
-      mul : multiply
+      mul : multiply,
+      equal : equal,
+      setValues : setValues,
+      fromValues : fromValues
     };
   })(window,
      {
@@ -486,22 +539,41 @@ function createMat4(heap_size) { // heap_size is optional.
 var mat4 = createMat4();
 
 /// Mat4 Tests
+check_reset();
 
 var A = mat4.create();
 mat4.set(A, 0, 0, 4.0);
+check_eq(mat4.get(A, 0, 0), 4.0, "mat4: set (a00)");
 mat4.set(A, 0, 1, 3.0);
+check_eq(mat4.get(A, 0, 1), 3.0, "mat4: set (a01)");
 mat4.set(A, 0, 2, 1.0);
-console.log(mat4.format(A));
+check_eq(mat4.get(A, 0, 2), 1.0, "mat4: set (a02)");
 
 var B = mat4.create();
 mat4.set(B, 0, 0, 0.0);
+check_eq(mat4.get(B, 0, 0), 0.0, "mat4: set (b00)");
 mat4.set(B, 1, 1, 0.0);
-console.log(mat4.format(B));
+check_eq(mat4.get(B, 1, 1), 0.0, "mat4: set (b11)");
 
 var C = mat4.create();
 
+check_ne(A, B);
+check_ne(A, C);
+check_eq(A, A, "mat4: self eq");
+check_eq(B, B, "mat4: self eq");
+check_eq(C, C, "mat4: self eq");
+
+formatarg = mat4.format;
+equalp = mat4.equal;
+
 mat4.multiply(C, A, B); // C = A × B
 
-console.log(mat4.format(C));
+mat4.setValues(B,
+               0.0, 0.0, 1.0, 0.0,
+               0.0, 0.0, 0.0, 0.0,
+               0.0, 0.0, 1.0, 0.0,
+               0.0, 0.0, 0.0, 1.0);
+
+check_eq(C, B, "mat4.multiply");
 
 check_status();
