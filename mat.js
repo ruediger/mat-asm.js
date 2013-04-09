@@ -378,7 +378,7 @@ function createMat4(heap_size) { // heap_size is optional.
     function _newmat() {
       var ptr = 0;
       ptr = last|0;
-      last = ((last|0) + 64)|0; // 64bytes = (4*4) * 4bytes
+      last = (last + 64)|0; // 64bytes = (4*4) * 4bytes
       return ptr|0;
     }
 
@@ -403,8 +403,8 @@ function createMat4(heap_size) { // heap_size is optional.
       var i = 0,
           j = 0;
       //HEAP.set(HEAP.subarray(ptr_from|0, (ptr_from+16)|0), ptr_to|0);
-      for(; (i|0) < 4; i = ((i|0) + 1)|0) {
-        for(; (j|0) < 4; j = ((j|0) + 1)|0) {
+      for(; (i|0) < 4; i = (i + 1)|0) {
+        for(; (j|0) < 4; j = (j + 1)|0) {
           set(Out, i, j, +get(A, i, j));
         }
         //HEAP[ (ptr_to + i)>>2 ] = +HEAP[ (ptr_from + i)>>2 ];
@@ -430,10 +430,10 @@ function createMat4(heap_size) { // heap_size is optional.
       return +HEAP[ (ptr + (i + 4*j)<<2)>>2 ];
     }
 
-    function multiply(out, a, b) {
-      out = out|0;
-      a = a|0;
-      b = b|0;
+    function multiply(Out, A, B) {
+      Out = Out|0;
+      A = A|0;
+      B = B|0;
 
       var i = 0;
       var j = 0;
@@ -441,13 +441,13 @@ function createMat4(heap_size) { // heap_size is optional.
 
       var sum = 0.0;
 
-      for(i=0; (i|0) < 4; i = ((i|0) + 1)|0) {
-        for(j=0; (j|0) < 4; j = ((j|0) + 1)|0) {
-          for(k=0; (k|0) < 4; k = ((k|0) + 1)|0) {
+      for(i=0; (i|0) < 4; i = (i + 1)|0) {
+        for(j=0; (j|0) < 4; j = (j + 1)|0) {
+          for(k=0; (k|0) < 4; k = (k + 1)|0) {
             sum = +sum +
-              +( (+get(a, i|0, k|0)) * (+get(b, k|0, j|0)) );
+              +( (+get(A, i, k)) * (+get(B, k, j)) );
           }
-          set(out, i|0, j|0, +sum);
+          set(Out, i, j, sum);
           sum = 0.0;
         }
       }
@@ -460,11 +460,11 @@ function createMat4(heap_size) { // heap_size is optional.
       v = +v;
       A = A|0;
 
-      var i = 0;
-      var j = 0;
+      var i = 0,
+          j = 0;
 
-      for(i=0; (i|0) < 4; i = ((i|0) + 1)|0) {
-        for(j=0; (j|0) < 4; j = ((j|0) + 1)|0) {
+      for(i=0; (i|0) < 4; i = (i + 1)|0) {
+        for(j=0; (j|0) < 4; j = (j + 1)|0) {
           set(Out, i, j, v * +get(A, i, j));
         }
       }
@@ -480,8 +480,8 @@ function createMat4(heap_size) { // heap_size is optional.
       var i = 0;
       var j = 0;
 
-      for(i=0; (i|0) < 4; i = ((i|0) + 1)|0) {
-        for(j=0; (j|0) < 4; j = ((j|0) + 1)|0) {
+      for(i=0; (i|0) < 4; i = (i + 1)|0) {
+        for(j=0; (j|0) < 4; j = (j + 1)|0) {
           set(Out, i, j, +get(A, i, j) + +get(B, i, j));
         }
       }
@@ -497,8 +497,8 @@ function createMat4(heap_size) { // heap_size is optional.
       var i = 0;
       var j = 0;
 
-      for(i=0; (i|0) < 4; i = ((i|0) + 1)|0) {
-        for(j=0; (j|0) < 4; j = ((j|0) + 1)|0) {
+      for(i=0; (i|0) < 4; i = (i + 1)|0) {
+        for(j=0; (j|0) < 4; j = (j + 1)|0) {
           set(Out, i, j, +get(A, i, j) - +get(B, i, j));
         }
       }
@@ -512,8 +512,8 @@ function createMat4(heap_size) { // heap_size is optional.
       var ret = 0;
       var i = 0;
       var j = 0;
-      for(i=0; (i|0) < 4; i = ((i|0) + 1)|0) {
-        for(j=0; (j|0) < 4; j = ((j|0) + 1)|0) {
+      for(i=0; (i|0) < 4; i = (i + 1)|0) {
+        for(j=0; (j|0) < 4; j = (j + 1)|0) {
           ret = ((ret|0) + ((+get(A, i, j) == +get(B, i, j))|0))|0;
         }
       }
@@ -591,6 +591,7 @@ function createMat4(heap_size) { // heap_size is optional.
         set(Out, 2, 2, +get(A, 2, 2));
         set(Out, 3, 3, +get(A, 3, 3));
       }
+      return;
     }
 
     // alternative for transpose
@@ -598,7 +599,7 @@ function createMat4(heap_size) { // heap_size is optional.
       ptr_to = ptr_to|0;
       ptr_from = ptr_from|0;
       var i = 0;
-      for(; (i|0) < 64; i = ((i|0) + 4)|0) {
+      for(; (i|0) < 64; i = (i + 4)|0) {
         HEAP[ (ptr_to + i)>>2 ] = +HEAP[ (ptr_from + i)>>2 ];
       }
       return;
@@ -709,6 +710,7 @@ function createMat4(heap_size) { // heap_size is optional.
       for(i = 0; (i|0) < 4; i = (i + 1)|0) {
         set(Out, i, column, +get(A, i, column));
       }
+      return;
     }
 
     function rotateX(Out, A, rad) {
@@ -765,7 +767,7 @@ function createMat4(heap_size) { // heap_size is optional.
         copyColumn(Out, A, 3);
       }
 
-      for(i = 0; (i|0) < 4; i = ((i|0) + 1)|0) {
+      for(i = 0; (i|0) < 4; i = (i + 1)|0) {
         set(Out, i, 0, c * +get(A, i, 0) - s * +get(A, i, 2));
         set(Out, i, 2, s * +get(A, i, 0) + c * +get(A, i, 2));
       }
@@ -796,7 +798,7 @@ function createMat4(heap_size) { // heap_size is optional.
         copyColumn(Out, A, 3);
       }
 
-      for(i = 0; (i|0) < 4; i = ((i|0) + 1)|0) {
+      for(i = 0; (i|0) < 4; i = (i + 1)|0) {
         set(Out, i, 0, c * +get(A, i, 0) + s * +get(A, i, 1));
         set(Out, i, 1, -s * +get(A, i, 0) + c * +get(A, i, 1));
       }
