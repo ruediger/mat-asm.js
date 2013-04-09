@@ -317,22 +317,40 @@ function createMat4(heap_size) { // heap_size is optional.
       A = A|0;
       B = B|0;
 
-      var i = 0;
-      var j = 0;
-      var k = 0;
+      //  (dotimes (i 4) (insert "var ") (dotimes (j 4) (insert (format "a%s%s = 0.0," i j))) (insert ";\n"))
+      var a00 = 0.0,a01 = 0.0,a02 = 0.0,a03 = 0.0;
+      var a10 = 0.0,a11 = 0.0,a12 = 0.0,a13 = 0.0;
+      var a20 = 0.0,a21 = 0.0,a22 = 0.0,a23 = 0.0;
+      var a30 = 0.0,a31 = 0.0,a32 = 0.0,a33 = 0.0;
+      var b0 = 0.0, b1 = 0.0, b2 = 0.0, b3 = 0.0;
 
-      var sum = 0.0;
+      // (dotimes (i 4) (dotimes (j 4) (insert (format "a%s%s = +get(A, %s, %s); " i j i j))) (insert "\n"))
+      a00 = +get(A, 0, 0); a01 = +get(A, 0, 1); a02 = +get(A, 0, 2); a03 = +get(A, 0, 3);
+      a10 = +get(A, 1, 0); a11 = +get(A, 1, 1); a12 = +get(A, 1, 2); a13 = +get(A, 1, 3);
+      a20 = +get(A, 2, 0); a21 = +get(A, 2, 1); a22 = +get(A, 2, 2); a23 = +get(A, 2, 3);
+      a30 = +get(A, 3, 0); a31 = +get(A, 3, 1); a32 = +get(A, 3, 2); a33 = +get(A, 3, 3);
 
-      for(i=0; (i|0) < 4; i = (i + 1)|0) {
-        for(j=0; (j|0) < 4; j = (j + 1)|0) {
-          for(k=0; (k|0) < 4; k = (k + 1)|0) {
-            sum = +sum +
-              +( (+get(A, i, k)) * (+get(B, k, j)) );
-          }
-          set(Out, i, j, sum);
-          sum = 0.0;
-        }
-      }
+      // (dotimes (j 4) (dotimes (k 4) (insert (format  "b%s = +get(B, %s, %s); " k k j))) (insert "\n") (dotimes (i 4) (insert (format "set(Out, %s, %s, " i j)) (dotimes (k 4) (insert (format "a%s%s * b%s + " i k k))) (insert "0.0);\n")))
+      b0 = +get(B, 0, 0); b1 = +get(B, 1, 0); b2 = +get(B, 2, 0); b3 = +get(B, 3, 0); 
+      set(Out, 0, 0, a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3);
+      set(Out, 1, 0, a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3);
+      set(Out, 2, 0, a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3);
+      set(Out, 3, 0, a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3);
+      b0 = +get(B, 0, 1); b1 = +get(B, 1, 1); b2 = +get(B, 2, 1); b3 = +get(B, 3, 1); 
+      set(Out, 0, 1, a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3);
+      set(Out, 1, 1, a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3);
+      set(Out, 2, 1, a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3);
+      set(Out, 3, 1, a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3);
+      b0 = +get(B, 0, 2); b1 = +get(B, 1, 2); b2 = +get(B, 2, 2); b3 = +get(B, 3, 2); 
+      set(Out, 0, 2, a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3);
+      set(Out, 1, 2, a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3);
+      set(Out, 2, 2, a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3);
+      set(Out, 3, 2, a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3);
+      b0 = +get(B, 0, 3); b1 = +get(B, 1, 3); b2 = +get(B, 2, 3); b3 = +get(B, 3, 3); 
+      set(Out, 0, 3, a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3);
+      set(Out, 1, 3, a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3);
+      set(Out, 2, 3, a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3);
+      set(Out, 3, 3, a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3);
 
       return;
     }
