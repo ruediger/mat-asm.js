@@ -29,7 +29,20 @@ collected.  To make matters worse you can't even manually free them because at
 the moment the internal memory is simply used as a stack.  So try to reuse
 pointers.
 
-----
+** Benchmark results
 
 For (disappointing) benchmark results check out
 [[https://github.com/ruediger/webgl-matrix-benchmarks/tree/mat-asm.js][my fork of webgl-matrix-benchmarks (mat-asm.js branch)]].
+
+(In million iterations per second)
+
+| Library      | Multiplication | Translation | Scaling | Rotation (Arbitrary axis) | Rotation (X axis) | Transpose |    Inverse | Inverse 3x3 | Vector Transformation | Average |
+| TDLFast      |          13.00 |       36.98 |   56.16 |                     14.20 |             43.38 |     69.76 |      10.83 |             |                       |   34.90 |
+| TDLMath      |           3.31 |       94.24 |   58.71 |                     20.98 |             69.60 |      1.33 |       3.26 |       11.60 |                 21.35 |   31.60 |
+| mjs          |          16.69 |       37.93 |   50.82 |                     17.16 |             22.51 |     74.70 | 5.86 (bad) |       16.39 |                 21.45 |   29.28 |
+| EWGL         |           9.76 |       31.68 |   31.76 |                     13.32 |             16.49 |     78.40 |       6.22 |             |                       |   26.80 |
+| closure      |          13.02 |       18.92 |   14.29 |                      1.33 |              1.31 |     39.00 |      14.15 |       25.44 |                 29.99 |   17.49 |
+| CanvasMatrix |          16.87 |        0.91 |    0.96 |                      0.57 |              0.53 |     80.05 |       7.23 |             |                       |   15.30 |
+| glMatrix     |          17.27 |       14.92 |   34.83 |                      1.35 |              1.40 |     16.11 |      14.88 |       16.74 |                       |   14.69 |
+| mat-asm.js   |           3.89 |        0.99 |         |                      0.73 |              1.26 |      7.70 |       2.62 |             |                       |    2.87 |
+| Sylvester    |           0.90 |             |         |                           |                   |      1.37 |       0.07 |        0.11 |                       |    0.61 |
