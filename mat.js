@@ -563,7 +563,8 @@ function createMat4(heap_size) { // heap_size is optional.
       setValues : setValues,
       fromValues : fromValues,
       transpose : transpose,
-      determinant : determinant
+      determinant : determinant,
+      det : determinant
     };
   })(window,
      {
