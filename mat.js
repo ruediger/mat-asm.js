@@ -340,7 +340,10 @@ function createMat4(heap_size) { // heap_size is optional.
     var sin = stdlib.Math.sin;
     var cos = stdlib.Math.cos;
     var tan = stdlib.Math.tan;
+    var abs = stdlib.Math.abs;
     var sqrt = stdlib.Math.sqrt;
+
+    var INF = stdlib.Infinity;
 
     var vec3_get = foreign.vec3_get;
     var vec3_set = foreign.vec3_set;
@@ -870,6 +873,97 @@ function createMat4(heap_size) { // heap_size is optional.
                 0.0, -2.0 * bt, 0.0, (top + bottom) * bt,
                 0.0, 0.0, 2.0 * nf, (far + near) * nf,
                 0.0, 0.0, 0.0, 1.0);
+      return;
+    }
+
+    function lookAt(Out, eye, center, up) {
+      Out = Out|0;
+      eye = eye|0; //vec3
+      center = center|0; //vec3
+      up = up|0; // vec3
+
+      var eyeX = 0.0,
+          eyeY = 0.0,
+          eyeZ = 0.0,
+          centerX = 0.0,
+          centerY = 0.0,
+          centerZ = 0.0,
+          upX = 0.0,
+          upY = 0.0,
+          upZ = 0.0,
+          z0 = 0.0,
+          z1 = 0.0,
+          z2 = 0.0,
+          x0 = 0.0,
+          x1 = 0.0,
+          x2 = 0.0,
+          y0 = 0.0,
+          y1 = 0.0,
+          y2 = 0.0,
+          olen = 0.0;
+
+      eyeX = +vec3_get(~~eye, 0);
+      eyeY = +vec3_get(~~eye, 1);
+      eyeZ = +vec3_get(~~eye, 2);
+
+      centerX = +vec3_get(~~center, 0);
+      centerY = +vec3_get(~~center, 1);
+      centerZ = +vec3_get(~~center, 2);
+
+      upX = +vec3_get(~~up, 0);
+      upY = +vec3_get(~~up, 1);
+      upZ = +vec3_get(~~up, 2);
+
+      z0 = eyeX - centerX;
+      z1 = eyeY - centerY;
+      z2 = eyeZ - centerZ;
+      olen = 1.0 / +sqrt(z0*z0 + z1*z1 + z2*z2);
+      if(+olen == INF) {
+        identity(Out);
+        return;
+      }
+      else {
+        z0 = z0 * olen;
+        z1 = z1 * olen;
+        z2 = z2 * olen;
+      }
+
+      x0 = upY * z2 - upZ * z1;
+      x1 = upZ * z0 - upX * z2;
+      x2 = upX * z1 - upY * z0;
+      olen = 1.0 / +sqrt(x0*x0 + x1*x1 + x2*x2);
+      if(+olen == INF) {
+        x0 = 0.0;
+        x1 = 0.0;
+        x2 = 0.0;
+      }
+      else {
+        x0 = x0 * olen;
+        x1 = x1 * olen;
+        x2 = x2 * olen;
+      }
+
+      y0 = z1 * x2 - z2 * x1;
+      y1 = z2 * x0 - z0 * x2;
+      y2 = z0 * x1 - z1 * x0;
+      olen = 1.0 / +sqrt(y0*y0 + y1*y1 + y2*y2);
+      if(+olen == INF) {
+        y0 = 0.0;
+        y1 = 0.0;
+        y2 = 0.0;
+      }
+      else {
+        y0 = y0 * olen;
+        y1 = y1 * olen;
+        y2 = y2 * olen;
+      }
+
+      setValues(Out,
+                x0, x1, x2, -(x0 * eyeX + x1 * eyeY + x2 * eyeZ),
+                y0, y1, y2, -(y0 * eyeX + y1 * eyeY + y2 * eyeZ),
+                z0, z1, z2, -(z0 * eyeX + z1 * eyeY + z2 * eyeZ),
+                0.0, 0.0, 0.0, 1.0);
+
       return;
     }
 
