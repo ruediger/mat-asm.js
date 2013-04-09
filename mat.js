@@ -451,6 +451,23 @@ function createMat4(heap_size) { // heap_size is optional.
       return;
     }
 
+    function multiplyScalar(Out, v, A) {
+      Out = Out|0;
+      v = +v;
+      A = A|0;
+
+      var i = 0;
+      var j = 0;
+
+      for(i=0; (i|0) < 4; i = ((i|0) + 1)|0) {
+        for(j=0; (j|0) < 4; j = ((j|0) + 1)|0) {
+          set(Out, i, j, v * +get(A, i, j));
+        }
+      }
+
+      return;
+    }
+
     function add(Out, A, B) {
       Out = Out|0;
       A = A|0;
@@ -458,7 +475,6 @@ function createMat4(heap_size) { // heap_size is optional.
 
       var i = 0;
       var j = 0;
-      var k = 0;
 
       for(i=0; (i|0) < 4; i = ((i|0) + 1)|0) {
         for(j=0; (j|0) < 4; j = ((j|0) + 1)|0) {
@@ -476,7 +492,6 @@ function createMat4(heap_size) { // heap_size is optional.
 
       var i = 0;
       var j = 0;
-      var k = 0;
 
       for(i=0; (i|0) < 4; i = ((i|0) + 1)|0) {
         for(j=0; (j|0) < 4; j = ((j|0) + 1)|0) {
@@ -730,6 +745,7 @@ function createMat4(heap_size) { // heap_size is optional.
       get : get,
       multiply : multiply,
       mul : multiply,
+      multiplyScalar : multiplyScalar,
       add : add,
       subtract : subtract,
       sub : subtract,
@@ -900,6 +916,19 @@ mat4.setValues(B,
                 9.0, 10.0, 10.0, 12.0,
                13.0, 14.0, 15.0, 15.0);
 check_eq(C, B, "mat4.sub");
+
+mat4.setValues(A,
+                1.0,  2.0,  3.0,  4.0,
+                5.0,  6.0,  7.0,  8.0,
+                9.0, 10.0, 11.0, 12.0,
+               13.0, 14.0, 15.0, 16.0);
+mat4.multiplyScalar(C, 2.0, A);
+mat4.setValues(A,
+               2.0, 4.0, 6.0, 8.0,
+               10.0, 12.0, 14.0, 16.0,
+               18.0, 20.0, 22.0, 24.0,
+               26.0, 28.0, 30.0, 32.0);
+check_eq(C, A, "mat4.multiplyScalar");
 
 check_reset();
 mat4.setValues(B,
