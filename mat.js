@@ -337,6 +337,9 @@ function createMat4(heap_size) { // heap_size is optional.
   var mat4 = (function(stdlib, foreign, heap) {
     "use asm";
 
+    var vec3_get = foreign.vec3_get;
+    var vec3_set = foreign.vec3_set;
+
     var HEAP = new stdlib.Float32Array(heap);
     var last = 0;
 
@@ -565,6 +568,33 @@ function createMat4(heap_size) { // heap_size is optional.
         );
     }
 
+    // Translate mat4 A by vec3 V and store in mat4 Out
+    function translate(Out, A, V) {
+      /*
+       *           1   0   0   x
+       *           0   1   0   y
+       * Out = A × 0   0   1   z
+       *           0   0   0   1
+       */
+      Out = Out|0; // mat4
+      A = A|0; // mat4
+      V = V|0; // vec3
+      var x = 0.0,
+          y = 0.0,
+          z = 0.0;
+      x = +vec3_get(~~V, 0);
+      y = +vec3_get(~~V, 1);
+      z = +vec3_get(~~V, 2);
+      if((A|0) != (Out|0)) {
+        copy(Out, A);
+      }
+      set(Out, 0, 3, +get(A, 0, 0) * x + +get(A, 0, 1) * y + +get(A, 0, 2) * z + +get(A, 0, 3));
+      set(Out, 1, 3, +get(A, 1, 0) * x + +get(A, 1, 1) * y + +get(A, 1, 2) * z + +get(A, 1, 3));
+      set(Out, 2, 3, +get(A, 2, 0) * x + +get(A, 2, 1) * y + +get(A, 2, 2) * z + +get(A, 2, 3));
+      set(Out, 3, 3, +get(A, 3, 0) * x + +get(A, 3, 1) * y + +get(A, 3, 2) * z + +get(A, 3, 3));
+      return;
+    }
+
     return {
       create : create,
       identity : identity,
@@ -579,7 +609,8 @@ function createMat4(heap_size) { // heap_size is optional.
       fromValues : fromValues,
       transpose : transpose,
       determinant : determinant,
-      det : determinant
+      det : determinant,
+      translate : translate
     };
   })(window,
      {
@@ -679,6 +710,20 @@ check_eq(C, B, "mat4.transpose");
 
 mat4.transpose(B, B);
 check_eq(B, A, "mat4.transpose self");
+
+mat4.setValues(A,
+                1.0,  2.0,  3.0,  4.0,
+                5.0,  6.0,  7.0,  8.0,
+                9.0, 10.0, 11.0, 12.0,
+               13.0, 14.0, 15.0, 16.0);
+vec3.setValues(v, 3.0, 4.0, 5.0);
+mat4.translate(C, A, v);
+mat4.setValues(B,
+                1.0,  2.0,  3.0,  30.0,
+                5.0,  6.0,  7.0,  82.0,
+                9.0, 10.0, 11.0, 134.0,
+               13.0, 14.0, 15.0, 186.0);
+check_eq(C, B, "mat4.translate");
 
 check_reset();
 mat4.setValues(B,
