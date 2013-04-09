@@ -28,3 +28,8 @@ One major design drawback is that matrices and vectors are *not* garbage
 collected.  To make matters worse you can't even manually free them because at
 the moment the internal memory is simply used as a stack.  So try to reuse
 pointers.
+
+----
+
+For (disappointing) benchmark results check out
+[[https://github.com/ruediger/webgl-matrix-benchmarks/tree/mat-asm.js][my fork of webgl-matrix-benchmarks (mat-asm.js branch)]].
