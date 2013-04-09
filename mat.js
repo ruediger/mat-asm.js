@@ -340,6 +340,7 @@ function createMat4(heap_size) { // heap_size is optional.
     var sin = stdlib.Math.sin;
     var cos = stdlib.Math.cos;
     var tan = stdlib.Math.tan;
+    var sqrt = stdlib.Math.sqrt;
 
     var vec3_get = foreign.vec3_get;
     var vec3_set = foreign.vec3_set;
@@ -650,10 +651,51 @@ function createMat4(heap_size) { // heap_size is optional.
       return;
     }
 
-    function rotate(Out, A, rad) {
+    function rotate(Out, A, v, rad) {
       Out = Out|0;
       A = A|0;
+      v = v|0;
       rad = +rad;
+
+      var x = 0.0,
+          y = 0.0,
+          z = 0.0,
+          olen = 0.0,
+          s = 0.0,
+          c = 0.0,
+          t = 0.0,
+          r00 = 0.0, r01 = 0.0, r02 = 0.0,
+          r10 = 0.0, r11 = 0.0, r12 = 0.0,
+          r20 = 0.0, r21 = 0.0, r22 = 0.0;
+      var i = 0,
+          j = 0;
+
+      x = +vec3_get(~~v, 0);
+      y = +vec3_get(~~v, 1);
+      z = +vec3_get(~~v, 2);
+      olen = 1.0/+sqrt(x*x + y*y + z*z);
+      x = x * olen; // normalize
+      y = y * olen;
+      z = z * olen;
+
+      s = +sin(rad);
+      c = +cos(rad);
+      t = 1.0 - c;
+
+      // construct rotation matrix
+      r00 = x * x * t + c;     r01 = y * x * t + z * s; r02 = z * x * t - y * s;
+      r10 = x * y * t - z * s; r11 = y * y * t + c;     r12 = z * y * t - x * s;
+      r20 = x * z * t + y * s; r21 = y * z * t - x * s; r22 = z * z * t + c;
+
+      // multiply
+      for(i = 0; (i|0) < 4; i = (i + 1)|0) {
+        set(Out, 0, i, +get(A, 0, i) * r00 + +get(A, 1, i) * r01 + +get(A, 2, i) * r02);
+        set(Out, 1, i, +get(A, 0, i) * r10 + +get(A, 1, i) * r11 + +get(A, 2, i) * r12);
+        set(Out, 2, i, +get(A, 0, i) * r20 + +get(A, 1, i) * r21 + +get(A, 2, i) * r22);
+        set(Out, 3, i, +get(A, 3, i));
+      }
+
+      return;
     }
 
     function copyColumn(Out, A, column) {
@@ -661,7 +703,7 @@ function createMat4(heap_size) { // heap_size is optional.
       A = A|0;
       column = column|0;
       var i = 0;
-      for(i = 0; (i|0) < 4; i = ((i|0) + 1)|0) {
+      for(i = 0; (i|0) < 4; i = (i + 1)|0) {
         set(Out, i, column, +get(A, i, column));
       }
     }
@@ -861,6 +903,7 @@ function createMat4(heap_size) { // heap_size is optional.
       perspective : perspective,
       ortho : ortho,
       trace : trace,
+      rotate : rotate,
       rotateX : rotateX,
       rotateY : rotateY,
       rotateZ : rotateZ
@@ -1045,7 +1088,10 @@ mat4.setValues(B,
                1.0, 1.0, -1.0, 1.0,
                1.0, 1.0, -1.0, 1.0,
                1.0, 1.0, -1.0, 1.0);
-check_eq(B, C, "mat4.rotateY");
+check_eq(B, C, "mat4.rotateX");
+vec3.setValues(v, 1.0, 0.0, 0.0);
+mat4.rotate(B, A, v, Math.PI/2);
+check_eq(B, C, "mat4.rotate (X)");
 mat4.rotateY(C, A, Math.PI/2);
 mat4.setValues(B,
                -1.0, 1.0, 1.0, 1.0,
@@ -1053,6 +1099,9 @@ mat4.setValues(B,
                -1.0, 1.0, 1.0, 1.0,
                -1.0, 1.0, 1.0, 1.0);
 check_eq(B, C, "mat4.rotateY");
+vec3.setValues(v, 0.0, 1.0, 0.0);
+mat4.rotate(B, A, v, Math.PI/2);
+check_eq(B, C, "mat4.rotate (Y)");
 mat4.rotateZ(C, A, Math.PI/2);
 mat4.setValues(B,
                1.0, -1.0, 1.0, 1.0,
@@ -1060,6 +1109,9 @@ mat4.setValues(B,
                1.0, -1.0, 1.0, 1.0,
                1.0, -1.0, 1.0, 1.0);
 check_eq(B, C, "mat4.rotateZ");
+vec3.setValues(v, 0.0, 0.0, 1.0);
+mat4.rotate(B, A, v, Math.PI/2);
+check_eq(B, C, "mat4.rotate (Z)");
 
 check_reset();
 mat4.setValues(B,
