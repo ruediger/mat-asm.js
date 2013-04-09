@@ -300,7 +300,7 @@ function createMat4(heap_size) { // heap_size is optional.
       j = j|0;
       value = +value;
 
-      HEAP[ (ptr + (i + 4*j)<<2)>>2 ] = value;
+      HEAP[ (ptr + (j + 4*i)<<2)>>2 ] = value;
       return;
     }
 
@@ -309,7 +309,7 @@ function createMat4(heap_size) { // heap_size is optional.
       i = i|0;
       j = j|0;
 
-      return +HEAP[ (ptr + (i + 4*j)<<2)>>2 ];
+      return +HEAP[ (ptr + (j + 4*i)<<2)>>2 ];
     }
 
     function multiply(Out, A, B) {
