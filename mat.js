@@ -726,6 +726,27 @@ function createMat4(heap_size) { // heap_size is optional.
     return tmp.subarray(A, A+16);
   };
 
+  mat4.fromArray = function(ar) {
+    if(ar.length < 16) {
+      return null;
+    }
+    return mat4.fromValues(
+      ar[0],  ar[1],  ar[2],  ar[3],
+      ar[4],  ar[5],  ar[6],  ar[7],
+      ar[8],  ar[9],  ar[10], ar[11],
+      ar[12], ar[13], ar[14], ar[15]
+    );
+  };
+
+  mat4.diag = function(A) {
+    return [
+      mat4.get(A, 0, 0),
+      mat4.get(A, 1, 1),
+      mat4.get(A, 2, 2),
+      mat4.get(A, 3, 3)
+      ];
+  };
+
   return mat4;
 }
 
