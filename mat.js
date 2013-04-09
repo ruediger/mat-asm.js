@@ -527,6 +527,29 @@ function createMat4(heap_size) { // heap_size is optional.
       }
     }
 
+    function determinant(A) {
+      A = A|0;
+      return +(
+          +(+get(A, 0, 0) * +get(A, 1, 1) - +get(A, 0, 1) * +get(A, 1, 0)) *
+          +(+get(A, 2, 2) * +get(A, 3, 3) - +get(A, 2, 3) * +get(A, 3, 2)) -
+
+          +(+get(A, 0, 0) * +get(A, 1, 2) - +get(A, 0, 2) * +get(A, 1, 0)) *
+          +(+get(A, 2, 1) * +get(A, 3, 3) - +get(A, 2, 3) * +get(A, 3, 1)) +
+
+          +(+get(A, 0, 0) * +get(A, 1, 3) - +get(A, 0, 3) * +get(A, 1, 0)) *
+          +(+get(A, 2, 1) * +get(A, 3, 2) - +get(A, 2, 2) * +get(A, 3, 1)) +
+
+          +(+get(A, 0, 1) * +get(A, 1, 2) - +get(A, 0, 2) * +get(A, 1, 1)) *
+          +(+get(A, 2, 0) * +get(A, 3, 3) - +get(A, 2, 3) * +get(A, 3, 0)) -
+
+          +(+get(A, 0, 1) * +get(A, 1, 3) - +get(A, 0, 3) * +get(A, 1, 1)) *
+          +(+get(A, 2, 0) * +get(A, 3, 2) - +get(A, 2, 2) * +get(A, 3, 0)) +
+
+          +(+get(A, 0, 2) * +get(A, 1, 3) - +get(A, 0, 3) * +get(A, 1, 2)) *
+          +(+get(A, 2, 0) * +get(A, 3, 1) - +get(A, 2, 1) * +get(A, 3, 0))
+        );
+    }
+
     return {
       create : create,
       identity : identity,
@@ -539,7 +562,8 @@ function createMat4(heap_size) { // heap_size is optional.
       equal : equal,
       setValues : setValues,
       fromValues : fromValues,
-      transpose : transpose
+      transpose : transpose,
+      determinant : determinant
     };
   })(window,
      {
@@ -637,5 +661,15 @@ check_eq(C, B, "mat4.transpose");
 
 mat4.transpose(B, B);
 check_eq(B, A, "mat4.transpose self");
+
+check_reset();
+mat4.setValues(B,
+               1.0,  5.0,  9.0, 13.0,
+               2.0,  6.0, 10.0,  8.0,
+               3.0,  7.0, 11.0, 15.0,
+               4.0,  8.0, 12.0, 16.0);
+check_eq(mat4.determinant(B), 0.0, "mat4.determinant");
+mat4.identity(B);
+check_eq(mat4.determinant(B), 1.0, "mat4.determinant (identity)");
 
 check_status();
