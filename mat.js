@@ -451,6 +451,42 @@ function createMat4(heap_size) { // heap_size is optional.
       return;
     }
 
+    function add(Out, A, B) {
+      Out = Out|0;
+      A = A|0;
+      B = B|0;
+
+      var i = 0;
+      var j = 0;
+      var k = 0;
+
+      for(i=0; (i|0) < 4; i = ((i|0) + 1)|0) {
+        for(j=0; (j|0) < 4; j = ((j|0) + 1)|0) {
+          set(Out, i, j, +get(A, i, j) + +get(B, i, j));
+        }
+      }
+
+      return;
+    }
+
+    function subtract(Out, A, B) {
+      Out = Out|0;
+      A = A|0;
+      B = B|0;
+
+      var i = 0;
+      var j = 0;
+      var k = 0;
+
+      for(i=0; (i|0) < 4; i = ((i|0) + 1)|0) {
+        for(j=0; (j|0) < 4; j = ((j|0) + 1)|0) {
+          set(Out, i, j, +get(A, i, j) - +get(B, i, j));
+        }
+      }
+
+      return;
+    }
+
     function equal(A, B) {
       A = A|0;
       B = B|0;
@@ -599,6 +635,15 @@ function createMat4(heap_size) { // heap_size is optional.
       return;
     }
 
+/*    function rotateX(Out, A, rad) {
+      Out = Out|0;
+      A = A|0;
+      rad = +rad;
+      if( (A|0) != (Out|0) ) {
+
+      }
+    }*/
+
     function frustum(Out, left, right, bottom, top, near, far) {
       Out = Out|0;
       left = +left;
@@ -685,6 +730,9 @@ function createMat4(heap_size) { // heap_size is optional.
       get : get,
       multiply : multiply,
       mul : multiply,
+      add : add,
+      subtract : subtract,
+      sub : subtract,
       equal : equal,
       setValues : setValues,
       fromValues : fromValues,
@@ -830,6 +878,28 @@ mat4.setValues(B,
                 9.0, 10.0, 11.0, 134.0,
                13.0, 14.0, 15.0, 186.0);
 check_eq(C, B, "mat4.translate");
+
+mat4.setValues(A,
+                1.0,  2.0,  3.0,  4.0,
+                5.0,  6.0,  7.0,  8.0,
+                9.0, 10.0, 11.0, 12.0,
+               13.0, 14.0, 15.0, 16.0);
+mat4.identity(B);
+mat4.add(C, A, B); // C = A + B
+mat4.setValues(B,
+                2.0,  2.0,  3.0,  4.0,
+                5.0,  7.0,  7.0,  8.0,
+                9.0, 10.0, 12.0, 12.0,
+               13.0, 14.0, 15.0, 17.0);
+check_eq(C, B, "mat4.add");
+mat4.identity(B);
+mat4.sub(C, A, B); // C = A - B
+mat4.setValues(B,
+                0.0,  2.0,  3.0,  4.0,
+                5.0,  5.0,  7.0,  8.0,
+                9.0, 10.0, 10.0, 12.0,
+               13.0, 14.0, 15.0, 15.0);
+check_eq(C, B, "mat4.sub");
 
 check_reset();
 mat4.setValues(B,
