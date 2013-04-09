@@ -519,7 +519,7 @@ function createMat4(heap_size) { // heap_size is optional.
       set(Out, 1, 3, a31);
       set(Out, 2, 3, a32);
 
-      if(Out !== A) {
+      if((Out|0) != (A|0)) {
         set(Out, 0, 0, +get(A, 0, 0));
         set(Out, 1, 1, +get(A, 1, 1));
         set(Out, 2, 2, +get(A, 2, 2));
