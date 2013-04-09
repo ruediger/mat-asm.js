@@ -972,6 +972,54 @@ function createMat4(heap_size) { // heap_size is optional.
       return +(+get(A, 0, 0) + +get(A, 1, 1) + +get(A, 2, 2) + +get(A, 3, 3));
     }
 
+    function invert(Out, A) {
+      Out = Out|0;
+      A = A|0;
+
+      var b00 = 0.0, b01 = 0.0, b02 = 0.0, b03 = 0.0,
+          b04 = 0.0, b05 = 0.0, b06 = 0.0, b07 = 0.0,
+          b08 = 0.0, b09 = 0.0, b10 = 0.0, b11 = 0.0,
+          odet = 0.0;
+
+      b00 = +get(A, 0, 0) * +get(A, 1, 1) - +get(A, 0, 1) * +get(A, 1, 0);
+      b01 = +get(A, 0, 0) * +get(A, 1, 2) - +get(A, 0, 2) * +get(A, 1, 0);
+      b02 = +get(A, 0, 0) * +get(A, 1, 3) - +get(A, 0, 3) * +get(A, 1, 0);
+      b03 = +get(A, 0, 1) * +get(A, 1, 2) - +get(A, 0, 2) * +get(A, 1, 1);
+      b04 = +get(A, 0, 1) * +get(A, 1, 3) - +get(A, 0, 3) * +get(A, 1, 1);
+      b05 = +get(A, 0, 2) * +get(A, 1, 3) - +get(A, 0, 3) * +get(A, 1, 2);
+      b06 = +get(A, 2, 0) * +get(A, 3, 1) - +get(A, 2, 1) * +get(A, 3, 0);
+      b07 = +get(A, 2, 0) * +get(A, 3, 2) - +get(A, 2, 2) * +get(A, 3, 0);
+      b08 = +get(A, 2, 0) * +get(A, 3, 3) - +get(A, 2, 3) * +get(A, 3, 0);
+      b09 = +get(A, 2, 1) * +get(A, 3, 2) - +get(A, 2, 2) * +get(A, 3, 1);
+      b10 = +get(A, 2, 1) * +get(A, 3, 3) - +get(A, 2, 3) * +get(A, 3, 1);
+      b11 = +get(A, 2, 2) * +get(A, 3, 3) - +get(A, 2, 3) * +get(A, 3, 2);
+
+      odet = 1.0/(b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06);
+
+      if(odet == INF) {
+        return;
+      }
+
+      set(Out, 0, 0, (+get(A, 1, 1) * b11 - +get(A, 1, 2) * b10 + +get(A, 1, 3) * b09) * odet);
+      set(Out, 0, 1, (+get(A, 0, 2) * b10 - +get(A, 0, 1) * b11 - +get(A, 0, 3) * b09) * odet);
+      set(Out, 0, 2, (+get(A, 3, 1) * b05 - +get(A, 3, 2) * b04 + +get(A, 3, 3) * b03) * odet);
+      set(Out, 0, 3, (+get(A, 2, 2) * b04 - +get(A, 2, 1) * b05 - +get(A, 2, 3) * b03) * odet);
+      set(Out, 1, 0, (+get(A, 1, 2) * b08 - +get(A, 1, 0) * b11 - +get(A, 1, 3) * b07) * odet);
+      set(Out, 1, 1, (+get(A, 0, 0) * b11 - +get(A, 0, 2) * b08 + +get(A, 0, 3) * b07) * odet);
+      set(Out, 1, 2, (+get(A, 3, 2) * b02 - +get(A, 3, 0) * b05 - +get(A, 3, 3) * b01) * odet);
+      set(Out, 1, 3, (+get(A, 2, 0) * b05 - +get(A, 2, 2) * b02 + +get(A, 2, 3) * b01) * odet);
+      set(Out, 2, 0, (+get(A, 1, 0) * b10 - +get(A, 1, 1) * b08 + +get(A, 1, 3) * b06) * odet);
+      set(Out, 2, 1, (+get(A, 0, 1) * b08 - +get(A, 0, 0) * b10 - +get(A, 0, 3) * b06) * odet);
+      set(Out, 2, 2, (+get(A, 3, 0) * b04 - +get(A, 3, 1) * b02 + +get(A, 3, 3) * b00) * odet);
+      set(Out, 2, 3, (+get(A, 2, 1) * b02 - +get(A, 2, 0) * b04 - +get(A, 2, 3) * b00) * odet);
+      set(Out, 3, 0, (+get(A, 1, 1) * b07 - +get(A, 1, 0) * b09 - +get(A, 1, 2) * b06) * odet);
+      set(Out, 3, 1, (+get(A, 0, 0) * b09 - +get(A, 0, 1) * b07 + +get(A, 0, 2) * b06) * odet);
+      set(Out, 3, 2, (+get(A, 3, 1) * b01 - +get(A, 3, 0) * b03 - +get(A, 3, 2) * b00) * odet);
+      set(Out, 3, 3, (+get(A, 2, 0) * b03 - +get(A, 2, 1) * b01 + +get(A, 2, 2) * b00) * odet);
+
+      return;
+    }
+
     return {
       create : create,
       identity : identity,
@@ -1000,7 +1048,9 @@ function createMat4(heap_size) { // heap_size is optional.
       rotate : rotate,
       rotateX : rotateX,
       rotateY : rotateY,
-      rotateZ : rotateZ
+      rotateZ : rotateZ,
+      invert : invert,
+      inv : invert
     };
   })(window,
      {
@@ -1206,6 +1256,19 @@ check_eq(B, C, "mat4.rotateZ");
 vec3.setValues(v, 0.0, 0.0, 1.0);
 mat4.rotate(B, A, v, Math.PI/2);
 check_eq(B, C, "mat4.rotate (Z)");
+
+mat4.identity(A);
+mat4.invert(C, A);
+check_eq(A, C, "mat4.invert");
+
+mat4.setValues(A,
+               1.0,   2.0,   0.0,   0.0,
+               4.0,   1.0,   0.0,   0.0,
+               0.0,   0.0,   1.0,   0.0,
+               0.0,   0.0,   0.0,   1.0);
+mat4.inv(C, A);
+// console.log(mat4.format(C));
+// TODO find a good example matrix.  Something that doesn't cause floating point rounding issues when compared.
 
 check_reset();
 mat4.setValues(B,
