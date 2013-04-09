@@ -491,6 +491,42 @@ function createMat4(heap_size) { // heap_size is optional.
       return;
     }
 
+    function transpose(Out, A) {
+      Out = Out|0;
+      A = A|0;
+      var a10 = 0.0,
+          a20 = 0.0, a21 = 0.0,
+          a30 = 0.0, a31 = 0.0, a32 = 0.0;
+      // cache values in case Out === A
+      a10 = +get(A, 1, 0);
+      a20 = +get(A, 2, 0);
+      a21 = +get(A, 2, 1);
+      a30 = +get(A, 3, 0);
+      a31 = +get(A, 3, 1);
+      a32 = +get(A, 3, 2);
+      
+      set(Out, 1, 0, +get(A, 0, 1));
+      set(Out, 2, 0, +get(A, 0, 2));
+      set(Out, 2, 1, +get(A, 1, 2));
+      set(Out, 3, 0, +get(A, 0, 3));
+      set(Out, 3, 1, +get(A, 1, 3));
+      set(Out, 3, 2, +get(A, 2, 3));
+
+      set(Out, 0, 1, a10);
+      set(Out, 0, 2, a20);
+      set(Out, 1, 2, a21);
+      set(Out, 0, 3, a30);
+      set(Out, 1, 3, a31);
+      set(Out, 2, 3, a32);
+
+      if(Out !== A) {
+        set(Out, 0, 0, +get(A, 0, 0));
+        set(Out, 1, 1, +get(A, 1, 1));
+        set(Out, 2, 2, +get(A, 2, 2));
+        set(Out, 3, 3, +get(A, 3, 3));
+      }
+    }
+
     return {
       create : create,
       identity : identity,
@@ -502,7 +538,8 @@ function createMat4(heap_size) { // heap_size is optional.
       mul : multiply,
       equal : equal,
       setValues : setValues,
-      fromValues : fromValues
+      fromValues : fromValues,
+      transpose : transpose
     };
   })(window,
      {
@@ -584,5 +621,21 @@ check_eq(A, B, "mat4.identity");
 
 mat4.copy(B, C);
 check_eq(B, C, "mat4.copy");
+
+mat4.setValues(A,
+                1.0,  2.0,  3.0,  4.0,
+                5.0,  6.0,  7.0,  8.0,
+                9.0, 10.0, 11.0, 12.0,
+               13.0, 14.0, 15.0, 16.0);
+mat4.setValues(B,
+                1.0,  5.0,  9.0, 13.0,
+                2.0,  6.0, 10.0,  8.0,
+                3.0,  7.0, 11.0, 15.0,
+                4.0,  8.0, 12.0, 16.0);
+mat4.transpose(C, A);
+check_eq(C, B, "mat4.transpose");
+
+mat4.transpose(B, B);
+check_eq(B, A, "mat4.transpose self");
 
 check_status();
