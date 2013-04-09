@@ -671,6 +671,11 @@ function createMat4(heap_size) { // heap_size is optional.
       return;
     }
 
+    function trace(A) {
+      A = A|0;
+      return +(+get(A, 0, 0) + +get(A, 1, 1) + +get(A, 2, 2) + +get(A, 3, 3));
+    }
+
     return {
       create : create,
       identity : identity,
@@ -689,7 +694,8 @@ function createMat4(heap_size) { // heap_size is optional.
       translate : translate,
       frustum : frustum,
       perspective : perspective,
-      ortho : ortho
+      ortho : ortho,
+      trace : trace
     };
   })(window,
      {
@@ -813,5 +819,16 @@ mat4.setValues(B,
 check_eq(mat4.determinant(B), 0.0, "mat4.determinant");
 mat4.identity(B);
 check_eq(mat4.determinant(B), 1.0, "mat4.determinant (identity)");
+
+mat4.setValues(B,
+               1.0,  5.0,  9.0, 13.0,
+               2.0,  6.0, 10.0,  8.0,
+               3.0,  7.0, 11.0, 15.0,
+               4.0,  8.0, 12.0, 16.0);
+check_eq(mat4.trace(B), 1.0+6.0+11.0+16.0, "mat4.trace");
+mat4.transpose(A, B);
+check_eq(mat4.trace(A), 1.0+6.0+11.0+16.0, "mat4.trace^T");
+mat4.identity(B);
+check_eq(mat4.trace(B), 4.0, "mat4.trace (identity)");
 
 check_status();
