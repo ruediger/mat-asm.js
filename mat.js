@@ -650,14 +650,46 @@ function createMat4(heap_size) { // heap_size is optional.
       return;
     }
 
-/*    function rotateX(Out, A, rad) {
+    function rotate(Out, A, rad) {
       Out = Out|0;
       A = A|0;
       rad = +rad;
-      if( (A|0) != (Out|0) ) {
+    }
 
+    function copyColumn(Out, A, column) {
+      Out = Out|0;
+      A = A|0;
+      column = column|0;
+      var i = 0;
+      for(i = 0; (i|0) < 4; i = ((i|0) + 1)|0) {
+        set(Out, i, column, +get(A, i, column));
       }
-    }*/
+    }
+
+    function rotateX(Out, A, rad) {
+      Out = Out|0;
+      A = A|0;
+      rad = +rad;
+
+      var s = 0.0,
+          c = 0.0;
+      var i = 0;
+
+      s = +sin(rad);
+      c = +cos(rad);
+
+      if( (A|0) != (Out|0) ) {
+        copyColumn(Out, A, 0);
+        copyColumn(Out, A, 3);
+      }
+
+      for(i = 0; (i|0) < 4; i = ((i|0) + 1)|0) {
+        set(Out, i, 1, c * +get(A, i, 1) + s * +get(A, i, 2));
+        set(Out, i, 2, -s * +get(A, i, 1) + c * +get(A, i, 2));
+      }
+
+      return;
+    }
 
     function frustum(Out, left, right, bottom, top, near, far) {
       Out = Out|0;
@@ -741,6 +773,7 @@ function createMat4(heap_size) { // heap_size is optional.
       identity : identity,
       clone : clone,
       copy : copy,
+      copyColumn : copyColumn,
       set : set,
       get : get,
       multiply : multiply,
@@ -759,7 +792,8 @@ function createMat4(heap_size) { // heap_size is optional.
       frustum : frustum,
       perspective : perspective,
       ortho : ortho,
-      trace : trace
+      trace : trace,
+      rotateX : rotateX
     };
   })(window,
      {
@@ -929,6 +963,15 @@ mat4.setValues(A,
                18.0, 20.0, 22.0, 24.0,
                26.0, 28.0, 30.0, 32.0);
 check_eq(C, A, "mat4.multiplyScalar");
+
+mat4.setValues(A,
+               1.0, 1.0, 1.0, 1.0,
+               1.0, 1.0, 1.0, 1.0,
+               1.0, 1.0, 1.0, 1.0,
+               1.0, 1.0, 1.0, 1.0);
+console.log(mat4.format(A));
+mat4.rotateX(C, A, Math.PI/3);
+console.log(mat4.format(C));
 
 check_reset();
 mat4.setValues(B,
