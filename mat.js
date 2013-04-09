@@ -386,13 +386,17 @@ function createMat4(heap_size) { // heap_size is optional.
       return new_ptr|0;
     }
 
-    function copy(ptr_to, ptr_from) {
-      ptr_to = ptr_to|0;
-      ptr_from = ptr_from|0;
-      var i = 0;
+    function copy(Out, A) {
+      Out = Out|0;
+      A = A|0;
+      var i = 0,
+          j = 0;
       //HEAP.set(HEAP.subarray(ptr_from|0, (ptr_from+16)|0), ptr_to|0);
-      for(; (i|0) < 64; i = ((i|0) + 4)|0) {
-        HEAP[ (ptr_to + i)>>2 ] = +HEAP[ (ptr_from + i)>>2 ];
+      for(; (i|0) < 4; i = ((i|0) + 1)|0) {
+        for(; (j|0) < 4; j = ((j|0) + 1)|0) {
+          set(Out, i, j, +get(A, i, j));
+        }
+        //HEAP[ (ptr_to + i)>>2 ] = +HEAP[ (ptr_from + i)>>2 ];
       }
       return;
     }
@@ -504,7 +508,7 @@ function createMat4(heap_size) { // heap_size is optional.
       a30 = +get(A, 3, 0);
       a31 = +get(A, 3, 1);
       a32 = +get(A, 3, 2);
-      
+
       set(Out, 1, 0, +get(A, 0, 1));
       set(Out, 2, 0, +get(A, 0, 2));
       set(Out, 2, 1, +get(A, 1, 2));
@@ -525,6 +529,17 @@ function createMat4(heap_size) { // heap_size is optional.
         set(Out, 2, 2, +get(A, 2, 2));
         set(Out, 3, 3, +get(A, 3, 3));
       }
+    }
+
+    // alternative for transpose
+    function transpose2(ptr_to, ptr_from) {
+      ptr_to = ptr_to|0;
+      ptr_from = ptr_from|0;
+      var i = 0;
+      for(; (i|0) < 64; i = ((i|0) + 4)|0) {
+        HEAP[ (ptr_to + i)>>2 ] = +HEAP[ (ptr_from + i)>>2 ];
+      }
+      return;
     }
 
     function determinant(A) {
@@ -652,6 +667,8 @@ mat4.setValues(A,
                 5.0,  6.0,  7.0,  8.0,
                 9.0, 10.0, 11.0, 12.0,
                13.0, 14.0, 15.0, 16.0);
+mat4.copy(C, A);
+check_eq(C, A, "mat4.copy");
 mat4.setValues(B,
                 1.0,  5.0,  9.0, 13.0,
                 2.0,  6.0, 10.0,  8.0,
