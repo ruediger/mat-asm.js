@@ -391,7 +391,7 @@ function createMat4(heap_size) { // heap_size is optional.
       ptr_from = ptr_from|0;
       var i = 0;
       //HEAP.set(HEAP.subarray(ptr_from|0, (ptr_from+16)|0), ptr_to|0);
-      for(; i|0 < 64; i = (i|0 + 4)|0) {
+      for(; (i|0) < 64; i = ((i|0) + 4)|0) {
         HEAP[ (ptr_to + i)>>2 ] = +HEAP[ (ptr_from + i)>>2 ];
       }
       return;
@@ -567,13 +567,22 @@ formatarg = mat4.format;
 equalp = mat4.equal;
 
 mat4.multiply(C, A, B); // C = A × B
-
 mat4.setValues(B,
                0.0, 0.0, 1.0, 0.0,
                0.0, 0.0, 0.0, 0.0,
                0.0, 0.0, 1.0, 0.0,
                0.0, 0.0, 0.0, 1.0);
-
 check_eq(C, B, "mat4.multiply");
+
+mat4.setValues(A,
+               1.0, 0.0, 0.0, 0.0,
+               0.0, 1.0, 0.0, 0.0,
+               0.0, 0.0, 1.0, 0.0,
+               0.0, 0.0, 0.0, 1.0);
+mat4.identity(B);
+check_eq(A, B, "mat4.identity");
+
+mat4.copy(B, C);
+check_eq(B, C, "mat4.copy");
 
 check_status();
