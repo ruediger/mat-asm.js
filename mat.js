@@ -667,6 +667,12 @@ function createMat4(heap_size) { // heap_size is optional.
     }
 
     function rotateX(Out, A, rad) {
+      /*
+                1 0  0 0
+                0 c -s 0
+        C = A × 0 s  c 0
+                0 0  0 1
+       */
       Out = Out|0;
       A = A|0;
       rad = +rad;
@@ -686,6 +692,68 @@ function createMat4(heap_size) { // heap_size is optional.
       for(i = 0; (i|0) < 4; i = ((i|0) + 1)|0) {
         set(Out, i, 1, c * +get(A, i, 1) + s * +get(A, i, 2));
         set(Out, i, 2, -s * +get(A, i, 1) + c * +get(A, i, 2));
+      }
+
+      return;
+    }
+
+    function rotateY(Out, A, rad) {
+      /*
+                 c 0 s 0
+                 0 1 0 0
+        C = A × -s 0 c 0
+                 0 0 0 1
+       */
+      Out = Out|0;
+      A = A|0;
+      rad = +rad;
+
+      var s = 0.0,
+          c = 0.0;
+      var i = 0;
+
+      s = +sin(rad);
+      c = +cos(rad);
+
+      if( (A|0) != (Out|0) ) {
+        copyColumn(Out, A, 1);
+        copyColumn(Out, A, 3);
+      }
+
+      for(i = 0; (i|0) < 4; i = ((i|0) + 1)|0) {
+        set(Out, i, 0, c * +get(A, i, 0) - s * +get(A, i, 2));
+        set(Out, i, 2, s * +get(A, i, 0) + c * +get(A, i, 2));
+      }
+
+      return;
+    }
+
+    function rotateZ(Out, A, rad) {
+      /*
+                c -s 0 0
+                s  c 0 0
+        C = A × 0  0 1 0
+                0  0 0 1
+       */
+      Out = Out|0;
+      A = A|0;
+      rad = +rad;
+
+      var s = 0.0,
+          c = 0.0;
+      var i = 0;
+
+      s = +sin(rad);
+      c = +cos(rad);
+
+      if( (A|0) != (Out|0) ) {
+        copyColumn(Out, A, 2);
+        copyColumn(Out, A, 3);
+      }
+
+      for(i = 0; (i|0) < 4; i = ((i|0) + 1)|0) {
+        set(Out, i, 0, c * +get(A, i, 0) + s * +get(A, i, 1));
+        set(Out, i, 1, -s * +get(A, i, 0) + c * +get(A, i, 1));
       }
 
       return;
@@ -793,7 +861,9 @@ function createMat4(heap_size) { // heap_size is optional.
       perspective : perspective,
       ortho : ortho,
       trace : trace,
-      rotateX : rotateX
+      rotateX : rotateX,
+      rotateY : rotateY,
+      rotateZ : rotateZ
     };
   })(window,
      {
@@ -969,9 +1039,27 @@ mat4.setValues(A,
                1.0, 1.0, 1.0, 1.0,
                1.0, 1.0, 1.0, 1.0,
                1.0, 1.0, 1.0, 1.0);
-console.log(mat4.format(A));
-mat4.rotateX(C, A, Math.PI/3);
-console.log(mat4.format(C));
+mat4.rotateX(C, A, Math.PI/2);
+mat4.setValues(B,
+               1.0, 1.0, -1.0, 1.0,
+               1.0, 1.0, -1.0, 1.0,
+               1.0, 1.0, -1.0, 1.0,
+               1.0, 1.0, -1.0, 1.0);
+check_eq(B, C, "mat4.rotateY");
+mat4.rotateY(C, A, Math.PI/2);
+mat4.setValues(B,
+               -1.0, 1.0, 1.0, 1.0,
+               -1.0, 1.0, 1.0, 1.0,
+               -1.0, 1.0, 1.0, 1.0,
+               -1.0, 1.0, 1.0, 1.0);
+check_eq(B, C, "mat4.rotateY");
+mat4.rotateZ(C, A, Math.PI/2);
+mat4.setValues(B,
+               1.0, -1.0, 1.0, 1.0,
+               1.0, -1.0, 1.0, 1.0,
+               1.0, -1.0, 1.0, 1.0,
+               1.0, -1.0, 1.0, 1.0);
+check_eq(B, C, "mat4.rotateZ");
 
 check_reset();
 mat4.setValues(B,
