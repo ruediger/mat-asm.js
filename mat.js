@@ -337,6 +337,10 @@ function createMat4(heap_size) { // heap_size is optional.
   var mat4 = (function(stdlib, foreign, heap) {
     "use asm";
 
+    var sin = stdlib.Math.sin;
+    var cos = stdlib.Math.cos;
+    var tan = stdlib.Math.tan;
+
     var vec3_get = foreign.vec3_get;
     var vec3_set = foreign.vec3_set;
 
@@ -595,6 +599,78 @@ function createMat4(heap_size) { // heap_size is optional.
       return;
     }
 
+    function frustum(Out, left, right, bottom, top, near, far) {
+      Out = Out|0;
+      left = +left;
+      right = +right;
+      bottom = +bottom;
+      top = +top;
+      near = +near;
+      far = +far;
+
+      var rl = 0.0,
+          tb = 0.0,
+          nf = 0.0;
+
+      rl = +( 1.0/+(right - left) );
+      tb = +( 1.0/+(top - bottom) );
+      nf = +( 1.0/+(near - far) );
+
+      setValues(Out,
+                2.0 * near * rl, 0.0, (right + left) * rl, 0.0,
+                0.0, 2.0 * near * tb, (top + bottom) * tb, 0.0,
+                0.0, 0.0, (far + near) * nf, far * near * 2.0 * nf,
+                0.0, 0.0,  -1.0, 0.0);
+      return;
+    }
+
+    function perspective(Out, fovy, aspect, near, far) {
+      Out = Out|0;
+      fovy = +fovy;
+      aspect = +aspect;
+      near = +near;
+      far = +far;
+
+      var f = 0.0,
+          nf = 0.0;
+
+      f = 1.0 / +tan(fovy/2.0);
+      nf = 1.0 / (near - far);
+
+      setValues(Out,
+                f/aspect, 0.0, 0.0, 0.0,
+                0.0, f, 0.0, 0.0,
+                0.0, 0.0, (far + near) * nf, 2.0 * far * near * nf,
+                0.0, 0.0, -1.0, 0.0);
+
+      return;
+    }
+
+    function ortho(Out, left, right, bottom, top, near, far) {
+      Out = Out|0;
+      left = +left;
+      right = +right;
+      bottom = +bottom;
+      top = +top;
+      near = +near;
+      far = +far;
+
+      var lr = 0.0,
+          bt = 0.0,
+          nf = 0.0;
+
+      lr = 1.0 / (left - right);
+      bt = 1.0 / (bottom - top);
+      nf = 1.0 / (near - far);
+
+      setValues(Out,
+                -2.0 * lr, 0.0, 0.0, (right + left ) * lr,
+                0.0, -2.0 * bt, 0.0, (top + bottom) * bt,
+                0.0, 0.0, 2.0 * nf, (far + near) * nf,
+                0.0, 0.0, 0.0, 1.0);
+      return;
+    }
+
     return {
       create : create,
       identity : identity,
@@ -610,7 +686,10 @@ function createMat4(heap_size) { // heap_size is optional.
       transpose : transpose,
       determinant : determinant,
       det : determinant,
-      translate : translate
+      translate : translate,
+      frustum : frustum,
+      perspective : perspective,
+      ortho : ortho
     };
   })(window,
      {
